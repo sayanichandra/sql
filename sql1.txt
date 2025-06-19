@@ -1,0 +1,64 @@
+Create Table DEPT(
+	DEPTNO Number(2) primary key,
+	DNAME Varchar(20),
+	LOC Varchar(20));
+
+insert into DEPT values(10, 'Accounting', 'New York');
+insert into DEPT values(20, 'Research', 'Dallas');
+insert into DEPT values(30, 'Sales', 'Chicago');
+insert into DEPT values(40, 'Operations', 'Boston');
+
+Create Table EMP(
+	EMPNO Number(4) primary key,
+	ENAME Varchar(20),
+	JOB Char(15),
+	MGR Number(4),
+	HIREDATE Date,
+	SAL Number(4),
+	COMM Number(4),
+	DEPTNO Number(1p));
+
+insert into EMP values(7369, 'Smith', 'Clerk', 7902, '17-Dec-1980', 800, NULL, 20);
+insert into EMP values(7499, 'Allen', 'Salesman', 7698, '20-Feb-1981', 1600, 300, 30);
+insert into EMP values(7521, 'Ward', 'Salesman', 7698, '22-Feb-1981', 1250, 500, 30);
+insert into EMP values(7566, 'Jones', 'Manager', 7839, '2-Apr-1981', 2975, NULL, 20);
+insert into EMP values(7654, 'Martin', 'Salesman', 7698, '28-Sep-1981', 1250, 1400, 30);
+insert into EMP values(7698, 'Blake', 'Manager', 7839, '1-May-1981', 2850, NULL, 30);
+insert into EMP values(7782, 'Clark', 'Manager', 7839, '9-Jun-1981', 2450, NULL, 10);
+insert into EMP values(7788, 'Scott', 'Analyst', 7566, '9-Dec-1982', 3000, NULL, 20);
+insert into EMP values(7839, 'King', 'President', NULL, '17-Nov-1981', 5000, NULL, 10);
+insert into EMP values(7844, 'Turner', 'Salesman', 7698, '8-Sep-1981', 1500, 0, 30);
+insert into EMP values(7876, 'Adams', 'Clerk', 7788, '12-Jan-1983', 1100, NULL, 20);
+insert into EMP values(7900, 'James', 'Clerk', 7698, '3-Dec-1981', 950, NULL, 30);
+insert into EMP values(7902, 'Ford', 'Analyst', 7566, '4-Dec-1981', 3000, NULL, 20);
+insert into EMP values(7934, 'Miller', 'Clerk', 7782, '23-Jan-1982', 1300, NULL, 10);
+
+a)Display all the details of all employees who are working as managers.
+select * from EMP where 'JOB'='Manager';
+
+b) Display all the records in the EMP table.
+select * from EMP;
+
+c) Display the details of the employee whose employee number 7369
+select * from EMP where EMPNO=7369;
+
+d) Display details of all the employees who joined on 1st May 1981.
+select * from EMP where HIREDATE = '1-May-1981';
+
+e) Display details of all the Employees with salary get up then 1500.
+select * from EMP where SAL > 1500;
+
+f) Display details of all the employees who are not getting any commission.
+select * from EMP where COMM is Null;
+
+g) Display details of all the employees whose names are starting with " A."
+select * from EMP where ENAME like 'A%';
+
+h)Add a new attribute phone number to the EMP table.
+alter table EMP add PHONENO Number(10);
+
+i) Change the data type of attribute job from char to varchar2.
+alter table EMP modify JOB varchar2(20);
+
+j) Remove the attribute phone number from tableEMP.
+alter table EMP drop column PHONENO;

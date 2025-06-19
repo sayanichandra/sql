@@ -1,0 +1,242 @@
+CREATE TABLE CLIENT_MASTER(
+	CLIENT_NO VARCHAR2(6) PRIMARY KEY ,
+	NAME VARCHAR2(20) NOT NULL,
+	CITY VARCHAR2(15),
+	PINCODE NUMBER(8),
+	STATE VARCHAR2(15),
+	BAL_DUE NUMBER(10,2),
+ CONSTRAINT CHECK1 CHECK(CLIENT_NO LIKE 'C%')
+);
+
+CREATE TABLE PRODUCT_MASTER(
+	PRODUCT_NO VARCHAR2(6) PRIMARY KEY ,
+	DESCRIPTION VARCHAR2(15) NOT NULL,
+	PROFIT_PERCENT NUMBER(4,2)  NOT NULL,
+	UNIT_MEASURE VARCHAR2(10) NOT NULL,
+	QTY_ON_HAND NUMBER(8) NOT NULL,
+	REORDER_LVL NUMBER(8) NOT NULL,
+	SELL_PRICE NUMBER(8,2) NOT NULL,
+	COST_PRICE NUMBER(8,2) NOT NULL,
+CONSTRAINT C1 CHECK(SELL_PRICE <>0),
+CONSTRAINT C2 CHECK(COST_PRICE <> 0 AND PRODUCT_NO LIKE 'P%')
+);
+
+CREATE TABLE SALESMAN_MASTER(
+	SALESMAN_NO VARCHAR2(6) PRIMARY KEY ,
+	SALESMAN_NAME VARCHAR2(20) NOT NULL,
+	ADDRESS1 VARCHAR2(10) NOT NULL,
+	ADDRESS2 VARCHAR2(10),
+	CITY VARCHAR2(15),
+	PINCODE NUMBER(7),
+	STATE VARCHAR2(20),
+	SAL_AMT NUMBER(8,2) NOT NULL,
+	TGT_TO_GET NUMBER(6,2) NOT NULL,
+	YTD_SALES NUMBER(6,2) NOT NULL,
+	REMARKS VARCHAR2(20)
+CONSTRAINT CHK3 CHECK(SALESMAN_NO LIKE 'S%' AND SAL_AMT<>0 AND TGT_TO_GET <> 0)
+);
+
+
+CREATE TABLE SALES_ORDER (
+    ORDER_NO VARCHAR2(6) PRIMARY KEY ,
+    ORDER_DATE DATE,
+    CLIENT_NO VARCHAR2(6) REFERENCES CLIENT_MASTER(CLIENT_NO),
+    DELY_ADDRESS VARCHAR2(25),
+    SALESMAN_NO VARCHAR2(6) REFERENCES SALESMAN_MASTER(SALESMAN_NO),
+    DELY_TYPE CHAR(1) ,
+    BILLED_YN CHAR(1),
+    DELY_DATE DATE,
+    ORDER_STATUS VARCHAR2(10) CHECK(ORDER_STATUS IN ('IN PROCESS', 'FULFILLED', 'BACKORDER', 'CANCELLED')),
+    CONSTRAINT CHK4 CHECK(DELY_DATE >= ORDER_DATE CHECK(ORDER_NO LIKE 'O%' AND DELY_TYPE ='P' AND DELY_DATE>=ORDER_DATE));
+
+CREATE TABLE SALES_ORDER_DETAILS (
+    ORDER_NO VARCHAR2(6) REFERENCES SALES_ORDER(ORDER_NO),
+    PRODUCT_NO VARCHAR2(6) REFERENCES PRODUCT_MASTER(PRODUCT_NO),
+    QTY_ORDERED NUMBER(8),
+    QTY_DISP NUMBER(8),
+    PRODUCT_RATE NUMBER(10,2),
+    CONSTRAINT PRIMARY_KEY_CONS PRIMARY KEY(ORDER_NO, PRODUCT_NO));
+
+
+INSERT INTO CLIENT_MASTER VALUES('C00001', 'Ivan Bayross', 'Mumbai', 400054, 'Maharashtra', 15000);
+INSERT INTO CLIENT_MASTER VALUES('C00002', 'Mamta Mazumdar', 'Madras', 780001, 'Tamil Nadu', 0);
+INSERT INTO CLIENT_MASTER VALUES('C00003', 'Chhaya Bankar', 'Mumbai', 400057, 'Maharashtra', 5000);
+INSERT INTO CLIENT_MASTER VALUES('C00004', 'Ashwini Joshi', 'Bangalore', 560001, 'Karnataka', 0);
+INSERT INTO CLIENT_MASTER VALUES('C00005', 'Hansel Colaco', 'Mumbai', 400060, 'Maharashtra', 2000);
+INSERT INTO CLIENT_MASTER VALUES('C00006', 'Deepak Sharma', 'Mangalore', 560050, 'Karnataka', 0);
+
+
+INSERT INTO PRODUCT_MASTER VALUES('P00001', 'T-Shirts', 5, 'Piece', 200, 50, 350, 250);
+INSERT INTO PRODUCT_MASTER VALUES('P00345', 'Shirts', 6, 'Piece', 150, 50, 500, 350);
+INSERT INTO PRODUCT_MASTER VALUES('P06734', 'Cotton Jeans', 5, 'Piece', 100, 20, 600, 450);
+INSERT INTO PRODUCT_MASTER VALUES('P07865', 'Jeans', 5, 'Piece', 100, 20, 750, 500);
+INSERT INTO PRODUCT_MASTER VALUES('P07868', 'Trousers', 2, 'Piece', 150, 50, 850, 550);
+INSERT INTO PRODUCT_MASTER VALUES('P07885', 'Pull-Overs', 2.5, 'Piece', 80, 30, 700, 450);
+INSERT INTO PRODUCT_MASTER VALUES('P07965', 'Denim Shirts', 4, 'Piece', 100, 40, 350, 250);
+INSERT INTO PRODUCT_MASTER VALUES('P07975', 'Lyers Tops', 5, 'Piece', 70, 30, 300, 175);
+INSERT INTO PRODUCT_MASTER VALUES('P08865', 'Skirts', 5, 'Piece', 75, 30, 450, 300);
+
+
+INSERT INTO SALESMAN_MASTER VALUES('S00001', 'Aman', 'A/14', 'Worli', 'Mumbai', 400002, 'Maharashtra', 3000, 100, 50, 'Good');
+INSERT INTO SALESMAN_MASTER VALUES('S00002', 'Omkar', '65', 'Nariman', 'Mumbai', 400001, 'Maharashtra', 3000, 200, 100, 'Good');
+INSERT INTO SALESMAN_MASTER VALUES('S00003', 'Raj', 'P-7', 'Bandra', 'Mumbai', 400032, 'Maharashtra', 3000, 200, 100, 'Good');
+INSERT INTO SALESMAN_MASTER VALUES('S00004', 'Ashish', 'A/5', 'Juhu', 'Mumbai', 400044, 'Maharashtra', 3500, 200, 150, 'Good');
+
+
+INSERT INTO SALES_ORDER VALUES('O19001', '12-Jun-04','C00001', Null, 'S00001', 'F', 'N',  '20-Jul-04', 'IN PROCESS');
+INSERT INTO SALES_ORDER VALUES('O19002', '25-Jun-04', 'C00002', Null, 'S00002', 'P', 'N', '27-Jun-04', 'CANCELLED');
+INSERT INTO SALES_ORDER VALUES('O46865', '18-Feb-04', 'C00003', Null, 'S00003', 'F', 'Y', '20-Feb-04', 'FULFILLED');
+INSERT INTO SALES_ORDER VALUES('O19003', '3-Apr-04', 'C00001', Null, 'S00001', 'F', 'Y', '7-Apr-04', 'FULFILLED');
+INSERT INTO SALES_ORDER VALUES('O46866', '20-May-04', 'C00004', Null, 'S00002', 'P', 'N', '22-May-04', 'CANCELLED');
+INSERT INTO SALES_ORDER VALUES('O19008', '24-May-04', 'C00005', Null, 'S00004', 'F', 'N', '26-Jul-04', 'IN PROCESS');
+
+
+INSERT INTO SALES_ORDER_DETAILS VALUES('O19001', 'P00001', 4, 4, 525);
+INSERT INTO SALES_ORDER_DETAILS VALUES('O19001', 'P07965', 2, 1, 8400);
+INSERT INTO SALES_ORDER_DETAILS VALUES('O19001', 'P07885', 2, 1, 5250);
+INSERT INTO SALES_ORDER_DETAILS VALUES('O19002', 'P00001', 10, 0, 525);
+INSERT INTO SALES_ORDER_DETAILS VALUES('O46865', 'P07868', 3, 3, 3150);
+INSERT INTO SALES_ORDER_DETAILS VALUES('O46865', 'P07885', 3, 1, 5250);
+INSERT INTO SALES_ORDER_DETAILS VALUES('O46865', 'P00001', 10, 10, 525);
+INSERT INTO SALES_ORDER_DETAILS VALUES('O46865', 'P00345', 4, 4, 1050);
+INSERT INTO SALES_ORDER_DETAILS VALUES('O19003', 'P06734', 1, 1, 12000);
+INSERT INTO SALES_ORDER_DETAILS VALUES('O46866', 'P07965', 1, 0, 8400);
+INSERT INTO SALES_ORDER_DETAILS VALUES('O46866', 'P07975', 1, 0, 1050);
+INSERT INTO SALES_ORDER_DETAILS VALUES('O19008', 'P00001', 10, 5, 525);
+INSERT INTO SALES_ORDER_DETAILS VALUES('O19008', 'P07975', 5, 3, 1050);
+
+
+
+a) find the names of all clients having 'a' as a second letter in their names.
+SQL> SELECT NAME FROM CLIENT_MASTER WHERE NAME LIKE '_a%';
+
+NAME
+--------------------
+Mamta Mazumdar
+Hansel Colaco
+b) find out the clients who stay in a city whose second letter is 'a'.
+SQL> SELECT * FROM CLIENT_MASTER WHERE CITY LIKE '_a%';
+
+CLIENT NAME                 CITY               PINCODE STATE              BAL_DUE
+------ -------------------- --------------- ---------- --------------- ----------
+C00002 Mamta Mazumdar       Madras              780001 Tamil Nadu               0
+C00004 Ashwini Joshi        Bangalore           560001 Karnataka                0
+C00006 Deepak Sharma        Mangalore           560050 Karnataka                0
+
+
+
+c) find out the clients who stay in 'Bombay' or 'Delhi'.
+SQL> SELECT * FROM CLIENT_MASTER WHERE CITY =Bombay' or CITY='Delhi';
+
+CLIENT_NO  NAME          CITY    PINCODE  STATE        BAL_DUE 
+ ----------  -------------  ------  -------  -----------  ------ 
+ C00001       Ivan Bayross   Mumbai  400054   Maharashtra  15000  
+ C00003      Chhaya Bankar  Mumbai  400057   Maharashtra  5000   
+ C00005      Hansel Colaco  Mumbai  400060   Maharashtra  2000   
+
+
+
+d) print the list of clients whose due balance is greater than 10000.
+SQL> SELECT * FROM CLIENT_MASTER WHERE BAL_DUE > 10000;
+
+CLIENT NAME                 CITY               PINCODE STATE              BAL_DUE
+------ -------------------- --------------- ---------- --------------- ----------
+C00001 Ivan Bayross         Mumbai              400054 Maharashtra          15000
+
+
+e)
+SQL> SELECT * FROM SALES_ORDER WHERE ORDER_DATE BETWEEN ('01-JUN-04' AND '30-JUN-04');
+
+ ORDER_NO  ORDER_DATE  CLIENT_NO  DELY_ADDR  SALESMAN_NO  DELY_TYPE  BILLYN  DELY_DATE  ORDER_STATUS 
+ ---------  -----------  ----------  ----------  ------------  ----------  ------  ----------  ------------- 
+ O19001     12-Jun-04    C00001      NULL       S00001        F           N       20-Jul-04   IN PROCESS    
+ O19002     25-Jun-04    C00002      NULL        S00002        P           N       27-Jun-04   CANCELLED     
+
+
+
+f) display the order information for the client number  'C00001' and 'C00002'.
+SQL> SELECT * FROM SALES_ORDER WHERE CLIENT_NO IN ('C00001', 'C00002');
+
+ORDER_NO  ORDER_DATE CLIENT_NO DELY_ADDRESS              SALESMAN_NO D B DELY_DATE ORDER_STATUS
+------ --------- ------ ------------------------- ------ - - --------- ----------
+O19001 12-JUN-04 C00001                           S00001 F N 20-JUL-04 IN PROCESS
+O19002 25-JUN-04 C00002                           S00002 P N 27-JUN-04 CANCELLED
+O19003 03-APR-04 C00001                           S00001 F Y 07-APR-04 FULFILLED
+
+
+g) fine products whose selling price is greater than 2000 and less than or equal to 5000.
+SQL> SELECT * FROM PRODUCT_MASTER WHERE SELL_PRICE > 2000 AND SELL_PRICE <= 5000;
+
+no rows selected
+
+
+h)
+SQL> SELECT PRODUCT_NO, DESCRIPTION, SELL_PRICE, SELL_PRICE*0.15 AS NEW_PRICE FROM PRODUCT_MASTER WHERE SELL_PRICE>70
+0;
+
+PRODUC DESCRIPTION     SELL_PRICE  NEW_PRICE
+------ --------------- ---------- ----------
+P07865 Jeans                  750      112.5
+P07868 Trousers               850      127.5
+
+
+i) list the names, city and state of the clients who are not in Maharashtra.
+SQL> SELECT NAME, CITY, STATE FROM CLIENT_MASTER WHERE STATE <> 'Maharashtra';
+
+NAME                 CITY            STATE
+-------------------- --------------- ---------------
+Mamta Mazumdar       Madras          Tamil Nadu
+Ashwini Joshi        Bangalore       Karnataka
+Deepak Sharma        Mangalore       Karnataka
+
+
+j) count the total number of orders.
+SQL> SELECT COUNT(ORDER_NO) AS NO_OF_ORDERS FROM SALES_ORDER;
+
+NO_OF_ORDERS
+------------
+           6
+
+
+k) calculator average price of all products.
+SQL> SELECT AVG(COST_PRICE) FROM PRODUCT_MASTER;
+
+AVG(COST_PRICE)
+---------------
+     363.888889
+
+
+l) determine the maximum and minimum product price and renamed the output as max_price and min_price respectively .
+SQL> SELECT MAX(COST_PRICE) AS MAX_PRICE, MIN(COST_PRICE) AS MIN_PRICE FROM PRODUCT_MASTER;
+
+ MAX_PRICE  MIN_PRICE
+---------- ----------
+       850        300
+
+
+m)
+SQL> SELECT COUNT(PRODUCT_NO) AS PRODUCT_COUNT FROM PRODUCT_MASTER WHERE COST_PRICE >= 1500;
+
+PRODUCT_COUNT
+-------------
+            0
+
+
+n)
+SQL> SELECT PRODUCT_NO, DESCRIPTION, QTY_ON_HAND, REORDER_LVL FROM PRODUCT_MASTER_07 WHERE QTY_ON_HAND < REORDER_LVL;
+
+no rows selected
+
+
+o))
+
+SQL> SELECT ORDER_NO, TO_CHAR(ORDER_DATE, 'Day') AS ORDER_DAY FROM SALES_ORDER;
+
+ORDER_ ORDER_DAY
+------ ------------------------------------
+O19001 Saturday
+O19002 Friday
+O46865 Wednesday
+O19003 Saturday
+O46866 Thursday
+O19008 Monday

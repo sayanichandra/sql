@@ -1,0 +1,190 @@
+1. select current_timestamp from dual;
+
+
+2. select 2*2 as result from dual;
+    RESULT
+----------
+         4
+
+
+
+3. select ABS(-15) as Result from Dual;
+    RESULT
+----------
+        15
+
+
+4. select SQRT(5) as Result from Dual;
+    RESULT
+----------
+2.23606798
+
+
+5. select ROUND(15.19) as Result from Dual;
+    RESULT
+----------
+        15
+
+
+6. select LOWER('IVAN BAYROSS') as lowercase from Dual;
+LOWERCASE
+------------
+ivan bayross
+
+
+7. select UPPER('IVAN BAYROSS') as uppercase from Dual;
+UPPERCASE
+------------
+IVAN BAYROSS
+
+
+
+9. SELECT MONTHS_BETWEEN(TO_DATE('02-JUL-01', 'DD-MON-YY'), TO_DATE('02-JAN-01', 'DD-MON-YY')) AS MONTHS_DIFFERENCE FROM DUAL;
+
+MONTHS_DIFFERENCE
+-----------------
+                6
+
+
+
+10. SELECT TO_CHAR(SYSDATE, 'DD/MM/YYYY') AS SYSTEM_DATE FROM DUAL;
+
+
+
+
+CREATE TABLE EMP(
+	EMPNO Number(4) primary key CHECK(EMPNO BETWEEN 7000 AND 8000),
+	ENAME Varchar(10),
+	JOB Varchar(20) NOT NULL,
+	MGR Number(4),
+	HIREDATE Date NOT NULL,
+	SAL Number(4) NOT NULL,
+	COMM Number(4) DEFAULT 0,
+	DEPT_NAME Varchar(15) NOT NULL ,
+	CONSTRAINT CHK5 CHECK(COMM<1500 AND JOB='Salesman' OR JOB <> 'Salesman'));
+
+insert into EMP values(7369, 'Smith', 'Clerk', 7902, '17-Dec-1980', 800, 0, 'Accounting');
+insert into EMP values(7499, 'Allen', 'Salesman', 7698, '20-Feb-1981', 1600, 300, 'Sales');
+insert into EMP values(7521, 'Ward', 'Salesman', 7698, '22-Feb-1981', 1250, 500, 'Sales');
+insert into EMP values(7566, 'Jones', 'Manager', 7839, '2-Apr-1981', 2975, 0, 'Operations');
+insert into EMP values(7654, 'Martin', 'Salesman', 7698, '28-Sep-1981', 1250, 1400, 'Sales');
+insert into EMP values(7698, 'Blake', 'Manager', 7839, '1-May-1981', 2850, 0, 'Operations');
+insert into EMP values(7782, 'Clark', 'Manager', 7839, '9-Jun-1981', 2450, 0, 'Operations');
+insert into EMP values(7788, 'Scott', 'Analyst', 7566, '9-Dec-1982', 3000, 0, 'Research');
+insert into EMP values(7839, 'King', 'President', NULL, '17-Nov-1981', 5000, 0, 'Operations');
+insert into EMP values(7844, 'Turner', 'Salesman', 7698, '8-Sep-1981', 1500, 0, 'Sales');
+insert into EMP values(7876, 'Adams', 'Clerk', 7788, '12-Jan-1983', 1100, 0, 'Accounting');
+insert into EMP values(7900, 'James', 'Clerk', 7698, '3-Dec-1981', 950, 0, 'Accounting');
+insert into EMP values(7902, 'Ford', 'Analyst', 7566, '4-Dec-1981', 3000, 0, 'Research');
+insert into EMP values(7934, 'Miller', 'Clerk', 7782, '23-Jan-1982', 1300, 0, 'Accounting');
+
+SELECT ENAME FROM EMP WHERE ENAME LIKE '_i%';
+ENAME
+----------
+King
+Miller
+
+
+SELECT ENAME FROM EMP WHERE JOB<>'Manager';
+ENAME
+----------
+Smith
+Allen
+Ward
+Martin
+Scott
+King
+Turner
+Adams
+James
+Ford
+Miller
+
+
+
+SELECT MAX(SAL) AS Maximum, MIN(SAL) AS Minimum, SUM(SAL) AS Total, AVG(SAL) AS Average FROM EMP;
+   MAXIMUM    MINIMUM      TOTAL    AVERAGE
+---------- ---------- ---------- ----------
+      5000        800      29025 2073.21429
+
+
+
+
+SELECT JOB, MAX(SAL) AS Maximum, MIN(SAL) AS Minimum, SUM(SAL) AS Total, AVG(SAL) AS Average FROM EMP GROUP BY JOB;
+JOB                     MAXIMUM    MINIMUM      TOTAL    AVERAGE
+-------------------- ---------- ---------- ---------- ----------
+Clerk                      1300        800       4150     1037.5
+Salesman                   1600       1250       5600       1400
+Manager                    2975       2450       8275 2758.33333
+Analyst                    3000       3000       6000       3000
+President                  5000       5000       5000       5000
+
+
+
+
+SELECT COUNT('Manager') AS Number_of_Managers FROM EMP WHERE JOB='Manager';
+NUMBER_OF_MANAGERS
+------------------
+                 3
+
+
+
+SELECT * FROM EMP WHERE HIREDATE > '01-JAN-1980';
+     EMPNO ENAME      JOB                         MGR HIREDATE         SAL       COMM DEPT_NAME
+---------- ---------- -------------------- ---------- --------- ---------- ---------- ---------------
+      7369 Smith      Clerk                      7902 17-DEC-80        800          0 Accounting
+      7499 Allen      Salesman                   7698 20-FEB-81       1600        300 Sales
+      7521 Ward       Salesman                   7698 22-FEB-81       1250        500 Sales
+
+
+
+
+SELECT * FROM EMP WHERE SAL = (SELECT MAX(SAL) FROM EMP WHERE JOB = 'Salesman') AND JOB = 'Salesman';
+     EMPNO ENAME      JOB                         MGR HIREDATE         SAL       COMM DEPT_NAME
+---------- ---------- -------------------- ---------- --------- ---------- ---------- ---------------
+      7499 Allen      Salesman                   7698 20-FEB-81       1600        300 Sales
+
+
+
+
+SELECT * FROM EMP WHERE SAL = (SELECT MIN(SAL) FROM EMP WHERE JOB = 'Clerk') AND JOB = 'Clerk';
+     EMPNO ENAME      JOB                         MGR HIREDATE         SAL       COMM DEPT_NAME
+---------- ---------- -------------------- ---------- --------- ---------- ---------- ---------------
+      7369 Smith      Clerk                      7902 17-DEC-80        800          0 Accounting
+
+
+
+SELECT ENAME, DEPT_NAME FROM EMP WHERE ENAME='Ford';
+ENAME      DEPT_NAME
+---------- ---------------
+Ford       Research
+
+
+
+SELECT DEPT_NAME FROM (SELECT DEPT_NAME, MAX(SAL) FROM EMP GROUP BY DEPT_NAME);
+DEPT_NAME
+---------------
+Accounting
+Sales
+Operations
+Research
+
+
+
+SELECT DEPT_NAME, SAL FROM EMP WHERE SAL = (SELECT MAX(SAL) FROM EMP);
+DEPT_NAME              SAL
+--------------- ----------
+Operations            5000
+
+
+
+SELECT ENAME FROM EMP WHERE SAL > (SELECT SAL FROM EMP WHERE ENAME = 'Turner');
+ENAME
+----------
+Allen
+Jones
+Blake
+Clark
+Scott
+King
+Ford
